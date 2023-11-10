@@ -1,7 +1,7 @@
 import pathlib
 
 
-class ApplicationConfiguration:
+class ConfigurationState:
     """
     Object containing the default or modified configuration state for the application
     """
