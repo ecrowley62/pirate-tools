@@ -44,7 +44,7 @@ class ConfigurationState:
             json.dump(conf_data, open_config)
 
     def read_config(self) -> dict[str, str]:
-        with open(self.local_log_file_path, 'r') as open_config:
+        with open(self.local_config_file_path, 'r') as open_config:
             conf_data = json.load(open_config)
             self.log_path = conf_data["LOG_LOCATION"]
 
