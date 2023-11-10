@@ -1,6 +1,5 @@
 import pathlib
 
-
 class ConfigurationState:
     """
     Object containing the default or modified configuration state for the application
@@ -17,3 +16,6 @@ class ConfigurationState:
             config_dir_path = pathlib.Path.home() + self.CONFIG_DIR_NAME
             self._local_configuration_directory = config_dir_path
         return self._local_configuration_directory
+
+if __name__ == '__main__':
+    config = ConfigurationState()
