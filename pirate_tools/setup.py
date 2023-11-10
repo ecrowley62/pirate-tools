@@ -1,6 +1,7 @@
 import pathlib
 import json
 
+
 class ConfigurationState:
     """
     Object containing the default or modified configuration state for the application
@@ -21,7 +22,7 @@ class ConfigurationState:
             config_dir_path = pathlib.Path.home() / self.CONFIG_DIR_NAME
             self._local_configuration_directory = config_dir_path
         return self._local_configuration_directory
-    
+
     @property
     def local_config_file_path(self) -> pathlib.Path:
         if not self._local_config_file:
@@ -36,18 +37,18 @@ class ConfigurationState:
     @property
     def config_exists(self) -> bool:
         return True if self.local_config_file_path.exists() else False
-        
+
     def create_config(self) -> None:
         self.local_configuration_directory.mkdir(exist_ok=True)
         conf_data = {"LOG_LOCATION": str(self.local_log_file_path)}
-        with open(self.local_config_file_path, 'w') as open_config:
+        with open(self.local_config_file_path, "w") as open_config:
             json.dump(conf_data, open_config)
 
     def read_config(self) -> dict[str, str]:
-        with open(self.local_config_file_path, 'r') as open_config:
+        with open(self.local_config_file_path, "r") as open_config:
             conf_data = json.load(open_config)
             self.log_path = conf_data["LOG_LOCATION"]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     config = ConfigurationState()
