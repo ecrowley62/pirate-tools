@@ -86,6 +86,37 @@ def setup_flat_file_log_output(
     logger.addHandler(file_handler)
     return logger
 
+def load_configuration_state(logger: logging.Logger, init_state: bool = False) -> ConfigurationState:
+    # Create the configuration state if needed
+    logger.info("Parse and load configuration: STARTING")
+    conf = ConfigurationState()
+    if init_state:
+        logger.debug("Initializing application configuration at users request")
+        conf.create_config()
+        logger.debug(f"Created config file located at {conf.config_file_path}")
+    elif not conf.config_exists:
+        err_msg = (
+            f"Configuration file at {conf.config_file_path} does not exist. "
+            "Run init to create configuration. "
+            "Parse and load configuration: FAILED!!!"
+        )
+        raise MalformedConfigFileError(err_msg)
+    else:
+        logger.debug(f"Using existing configuration file at {conf.config_file_path}")    
+    # Validate the configuration state
+    try:
+        conf.read_config()
+        conf.validate_config()
+    except MalformedConfigFileError as e:
+        err_msg = (
+            "The default configuration did not pass validation. "
+            f"Please check config values within config file {conf.config_file_path}"
+            f" and update these as appropriate for your system. Error: {e} "
+            "Parser and load configuration: FAILED!!!"
+        )
+        raise MalformedConfigFileError(err_msg)
+    logger.info("Parse and load configuration: SUCCESS!\n")
+    return conf
 
 if __name__ == "__main__":
     config = ConfigurationState()

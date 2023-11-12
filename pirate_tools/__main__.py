@@ -4,6 +4,7 @@ from pirate_tools.setup import (
     ConfigurationState,
     create_logging_interface,
     setup_flat_file_log_output,
+    load_configuration_state
 )
 from pirate_tools.errors import MalformedConfigFileError
 
@@ -15,39 +16,15 @@ to_stdout = provided_args.verbose or provided_args.debug
 logger = create_logging_interface(send_to_stdout=to_stdout, debug=provided_args.debug)
 logger.debug("Initial input arg parsing and logging setup: SUCCESS!\n")
 
-# Create the configuration state if needed
-logger.info("Parse and load configuration: STARTING")
-conf = ConfigurationState()
-if provided_args.init:
-    logger.debug("Initializing application configuration at users request")
-    conf.create_config()
-    logger.debug(f"Created config file located at {conf.config_file_path}")
-elif not conf.config_exists:
-    logger.error(
-        f"Configuration file at {conf.config_file_path} does not exist. "
-        "Run init to create configuration"
-    )
-    logger.error("Parse and load configuration: FAILED!!!")
-    quit(1)
-else:
-    logger.debug(f"Using existing configuration file at {conf.config_file_path}")
-
-# Validate the configuration state
+# Load the configurations state. Exit with failure status if the state can not be loaded
 try:
-    conf.read_config()
-    conf.validate_config()
+    conf = load_configuration_state(logger, provided_args.init)
 except MalformedConfigFileError as e:
-    logger.error(
-        "The default configuration did not pass validation. "
-        f"Please check config values within config file {conf.config_file_path}"
-        f" and update these as appropriate for your system. Error: {e}"
-    )
-    logger.debug("Parse and load configuration: FAILED!!!")
+    logger.error(e)
     quit(1)
-else:
-    logger.info("Parse and load configuration: SUCCESS!\n")
 
-# Setup logging to log file
+
+# Setup logging to log file based on configuration state
 logger.debug(f"Setting up logging to flat file {conf.log_file_path}")
 logger = setup_flat_file_log_output(logger, conf.log_file_path)
 logger.debug("Setup flat file logging: SUCCESS!\n")
