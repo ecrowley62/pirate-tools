@@ -5,6 +5,7 @@ from pirate_tools.errors import MalformedConfigFileError
 
 LOG_FORMAT = "%(asctime)s - [%(levelname)s]: %(message)s"
 
+
 class ConfigurationState:
     """
     Object containing the default or modified configuration state for the application
@@ -76,11 +77,15 @@ def create_logging_interface(
         logger.addHandler(console_handler)
     return logger
 
-def setup_flat_file_log_output(logger: logging.Logger, file_path: Path) -> logging.Logger:
+
+def setup_flat_file_log_output(
+    logger: logging.Logger, file_path: Path
+) -> logging.Logger:
     file_handler = logging.FileHandler(file_path)
     file_handler.setFormatter(LOG_FORMAT)
     logger.addHandler(file_handler)
     return logger
+
 
 if __name__ == "__main__":
     config = ConfigurationState()
