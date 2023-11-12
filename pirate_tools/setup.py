@@ -1,9 +1,6 @@
 from pathlib import Path
 import json
-import logging
 from pirate_tools.errors import MalformedConfigFileError
-
-logger = logging.getLogger(__name__)
 
 class ConfigurationState:
     """
