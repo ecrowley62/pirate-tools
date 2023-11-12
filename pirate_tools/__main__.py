@@ -1,7 +1,5 @@
-import logging
 from pirate_tools.argument_parser import parse_cli_arguments
 from pirate_tools.setup import (
-    ConfigurationState,
     create_logging_interface,
     setup_flat_file_log_output,
     load_configuration_state,
