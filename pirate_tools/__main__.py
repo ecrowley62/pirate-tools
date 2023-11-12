@@ -20,6 +20,8 @@ try:
 except MalformedConfigFileError as e:
     logger.error(e)
     quit(1)
+else:
+    logger.info('Correctly parsed configuration state')
 
 
 # Setup logging to log file based on configuration state

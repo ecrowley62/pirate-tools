@@ -91,7 +91,7 @@ def load_configuration_state(
     logger: logging.Logger, init_state: bool = False
 ) -> ConfigurationState:
     # Create the configuration state if needed
-    logger.info("Parse and load configuration: STARTING")
+    logger.debug("Parse and load configuration: STARTING")
     conf = ConfigurationState()
     if init_state:
         logger.debug("Initializing application configuration at users request")
@@ -118,7 +118,7 @@ def load_configuration_state(
             "Parser and load configuration: FAILED!!!"
         )
         raise MalformedConfigFileError(err_msg)
-    logger.info("Parse and load configuration: SUCCESS!\n")
+    logger.debug("Parse and load configuration: SUCCESS!\n")
     return conf
 
 
