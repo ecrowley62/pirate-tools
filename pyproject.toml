@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pirate-tools"
-version = "0.0.1"
+version = "0.0.2"
 description = "CLI Utility for renaming/organizing media files that have been torrented and have inconsistent naming"
 authors = ["Eric Crowley <eecmtf@gmail.com>"]
 readme = "README.md"
