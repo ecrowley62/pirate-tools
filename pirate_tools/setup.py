@@ -1,6 +1,9 @@
-import pathlib
+from pathlib import Path
 import json
+import logging
+from pirate_tools.errors import MalformedConfigFileError
 
+logger = logging.getLogger(__name__)
 
 class ConfigurationState:
     """
@@ -10,45 +13,56 @@ class ConfigurationState:
     CONFIG_DIR_NAME = ".pirate-tools"
     CONFIG_FILE_NAME = "config.json"
     LOG_FILE_NAME = "log.txt"
+    DOWNLOADS_DIR_NAME = "Downloads"
+    MEDIA_DIR_NAME = "Media"
 
-    def __init__(self, local_configuration_directory: str = None) -> None:
-        self._local_configuration_directory = local_configuration_directory
-        self._local_config_file = None
-        self.log_path = None
-
-    @property
-    def local_configuration_directory(self) -> pathlib.Path:
-        if not self._local_configuration_directory:
-            config_dir_path = pathlib.Path.home() / self.CONFIG_DIR_NAME
-            self._local_configuration_directory = config_dir_path
-        return self._local_configuration_directory
-
-    @property
-    def local_config_file_path(self) -> pathlib.Path:
-        if not self._local_config_file:
-            conf_file_path = self.local_configuration_directory / self.CONFIG_FILE_NAME
-            self._local_config_file = conf_file_path
-        return self._local_config_file
-
-    @property
-    def local_log_file_path(self) -> pathlib.Path:
-        return self.local_configuration_directory / self.LOG_FILE_NAME
+    def __init__(self) -> None:
+        self._home: Path = Path.home()
+        self.config_dir_path: Path = self._home / self.CONFIG_DIR_NAME
+        self.config_file_path: Path = self.config_dir_path / self.CONFIG_FILE_NAME
+        self.log_file_path: Path = self.config_dir_path / self.LOG_FILE_NAME
+        self.downloads_dir_path: Path = self._home / self.DOWNLOADS_DIR_NAME
+        self.media_dir_path: Path = self._home / self.MEDIA_DIR_NAME
 
     @property
     def config_exists(self) -> bool:
-        return True if self.local_config_file_path.exists() else False
+        return True if self.config_file_path.exists() else False
+
+    @property
+    def config_state_as_json(self) -> dict[str, str]:
+        return {
+            "log_file_path": str(self.log_file_path),
+            "downloads_dir_path": str(self.downloads_dir_path),
+            "media_dir_path": str(self.media_dir_path),
+        }
 
     def create_config(self) -> None:
-        self.local_configuration_directory.mkdir(exist_ok=True)
-        conf_data = {"LOG_LOCATION": str(self.local_log_file_path)}
-        with open(self.local_config_file_path, "w") as open_config:
-            json.dump(conf_data, open_config)
+        self.config_dir_path.mkdir(exist_ok=True)
+        with open(self.config_file_path, "w") as open_config:
+            json.dump(self.config_state_as_json, open_config)
 
     def read_config(self) -> dict[str, str]:
-        with open(self.local_config_file_path, "r") as open_config:
+        with open(self.config_file_path, "r") as open_config:
             conf_data = json.load(open_config)
-            self.log_path = conf_data["LOG_LOCATION"]
-
-
+            try:
+                self.log_file_path = Path(conf_data["log_file_path"])
+                self.downloads_dir_path = Path(conf_data["downloads_dir_path"])
+                self.media_dir_path = Path(conf_data["media_dir_path"])
+            except KeyError as e:
+                raise MalformedConfigFileError(
+                    f"Missing configuration key {e} in config file"
+                )
+            
+    def validate_config(self) -> None:
+        for path_name, path_value in self.config_state_as_json.items():
+            if not path_value:
+                err_msg = f"No value provided for {path_name}"
+                raise MalformedConfigFileError(err_msg)
+            path_as_path = Path(path_value)
+            if not path_as_path.exists():
+                err_msg = f"Configured path {path_name} at {path_value} does not exist"
+                raise MalformedConfigFileError(err_msg)
+            
+            
 if __name__ == "__main__":
     config = ConfigurationState()
