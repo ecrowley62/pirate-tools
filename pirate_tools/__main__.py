@@ -4,7 +4,7 @@ from pirate_tools.setup import (
     ConfigurationState,
     create_logging_interface,
     setup_flat_file_log_output,
-    load_configuration_state
+    load_configuration_state,
 )
 from pirate_tools.errors import MalformedConfigFileError
 

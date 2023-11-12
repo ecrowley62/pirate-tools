@@ -86,7 +86,10 @@ def setup_flat_file_log_output(
     logger.addHandler(file_handler)
     return logger
 
-def load_configuration_state(logger: logging.Logger, init_state: bool = False) -> ConfigurationState:
+
+def load_configuration_state(
+    logger: logging.Logger, init_state: bool = False
+) -> ConfigurationState:
     # Create the configuration state if needed
     logger.info("Parse and load configuration: STARTING")
     conf = ConfigurationState()
@@ -102,7 +105,7 @@ def load_configuration_state(logger: logging.Logger, init_state: bool = False) -
         )
         raise MalformedConfigFileError(err_msg)
     else:
-        logger.debug(f"Using existing configuration file at {conf.config_file_path}")    
+        logger.debug(f"Using existing configuration file at {conf.config_file_path}")
     # Validate the configuration state
     try:
         conf.read_config()
@@ -117,6 +120,7 @@ def load_configuration_state(logger: logging.Logger, init_state: bool = False) -
         raise MalformedConfigFileError(err_msg)
     logger.info("Parse and load configuration: SUCCESS!\n")
     return conf
+
 
 if __name__ == "__main__":
     config = ConfigurationState()
