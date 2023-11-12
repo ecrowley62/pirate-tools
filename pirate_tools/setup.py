@@ -1,6 +1,9 @@
 from pathlib import Path
+import logging
 import json
 from pirate_tools.errors import MalformedConfigFileError
+
+LOG_FORMAT = "%(asctime)s - [%(levelname)s]: %(message)s"
 
 class ConfigurationState:
     """
@@ -49,7 +52,7 @@ class ConfigurationState:
                 raise MalformedConfigFileError(
                     f"Missing configuration key {e} in config file"
                 )
-            
+
     def validate_config(self) -> None:
         for path_name, path_value in self.config_state_as_json.items():
             if not path_value:
@@ -59,7 +62,25 @@ class ConfigurationState:
             if not path_as_path.exists():
                 err_msg = f"Configured path {path_name} at {path_value} does not exist"
                 raise MalformedConfigFileError(err_msg)
-            
-            
+
+
+def create_logging_interface(
+    send_to_stdout: bool = True, debug: bool = False
+) -> logging.Logger:
+    log_format = logging.Formatter(LOG_FORMAT)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    if send_to_stdout:
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(log_format)
+        logger.addHandler(console_handler)
+    return logger
+
+def setup_flat_file_log_output(logger: logging.Logger, file_path: Path) -> logging.Logger:
+    file_handler = logging.FileHandler(file_path)
+    file_handler.setFormatter(LOG_FORMAT)
+    logger.addHandler(file_handler)
+    return logger
+
 if __name__ == "__main__":
     config = ConfigurationState()

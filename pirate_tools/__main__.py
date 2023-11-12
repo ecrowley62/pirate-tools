@@ -1,19 +1,14 @@
 import logging
 from pirate_tools.argument_parser import parse_cli_arguments
-from pirate_tools.setup import ConfigurationState
+from pirate_tools.setup import ConfigurationState, create_logging_interface, setup_flat_file_log_output
 from pirate_tools.errors import MalformedConfigFileError
 
 # Parse input arguments
 provided_args = parse_cli_arguments()
 
 # Setup logging
-log_format = logging.Formatter("%(asctime)s - [%(levelname)s]: %(message)s")
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG if provided_args.debug else logging.INFO)
-if provided_args.verbose or provided_args.debug:
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(log_format)
-    logger.addHandler(console_handler)
+to_stdout = provided_args.verbose or provided_args.debug
+logger = create_logging_interface(send_to_stdout=to_stdout, debug=provided_args.debug)
 logger.debug("Initial input arg parsing and logging setup: SUCCESS!\n")
 
 # Create the configuration state if needed
@@ -50,7 +45,5 @@ else:
 
 # Setup logging to log file
 logger.debug(f"Setting up logging to flat file {conf.log_file_path}")
-file_handler = logging.FileHandler(conf.log_file_path)
-file_handler.setFormatter(log_format)
-logger.addHandler(file_handler)
+logger = setup_flat_file_log_output(logger, conf.log_file_path)
 logger.debug("Setup flat file logging: SUCCESS!\n")
