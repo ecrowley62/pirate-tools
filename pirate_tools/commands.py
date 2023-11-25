@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 # Base builder class and the builder director
 
@@ -48,9 +49,20 @@ class RenameCommandExecutionPlan:
     Object containing information needed to execute a Rename command 
     """
     def __init__(self) -> None:
-        self.target_file: str = None
-        self.is_directory: bool = None
+        self._target_file: Path = None
         self.recurse: bool = None
+
+    @property
+    def target_file(self) -> Path:
+        return self._target_file
+    
+    @target_file.setter
+    def target_file(self, path: str) -> None:
+        self._target_file = Path(path)
+
+    @property
+    def is_directory(self) -> bool:
+        return self._target_file.is_dir()
 
 
 class RenameBuilder(CommandExecutionPlanBuilder):
@@ -77,7 +89,8 @@ class RenameBuilder(CommandExecutionPlanBuilder):
         return command
     
     def parse_input(self, target_file: str, recurse: bool = False) -> None:
-        pass
+        self._command.target_file = target_file
+        self._command.recurse = recurse
 
 
 
